@@ -130,3 +130,6 @@ async def get_project_tasks(
     return TaskListResponse(
         tasks=[TaskResponse.model_validate(t) for t in tasks]
     )
+
+
+# TODO: Add a project statistics endpoint.
