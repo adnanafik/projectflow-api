@@ -1,6 +1,7 @@
 """Task business logic."""
 
 import uuid
+from datetime import date
 from typing import List, Optional
 
 from sqlalchemy import select
@@ -33,6 +34,7 @@ async def create_task(db: AsyncSession, data: TaskCreate) -> Task:
         priority="medium",
         project_id=data.project_id,
         assignee_id=data.assignee_id,
+        due_date=data.due_date if data.due_date is not None else date.today(),
     )
     db.add(task)
     await db.commit()
