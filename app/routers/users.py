@@ -1,7 +1,6 @@
 """User management endpoints."""
 
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
@@ -9,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.schemas.common import ErrorResponse, MessageResponse
+from app.schemas.task import TaskListResponse, TaskResponse
 from app.schemas.user import UserCreate, UserListResponse, UserResponse, UserUpdate
-from app.services import user_service
+from app.services import user_service, task_service
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -108,12 +108,12 @@ async def delete_user(
 
 @router.get(
     "/{user_id}/tasks",
-    response_model=List[dict],
+    response_model=TaskListResponse,
     responses={404: {"model": ErrorResponse}},
 )
 async def get_user_tasks(
     user_id: uuid.UUID, db: AsyncSession = Depends(get_db)
-) -> list:
+) -> TaskListResponse:
     """Get all tasks assigned to a user."""
     user = await user_service.get_user(db, user_id)
     if not user:
@@ -121,5 +121,7 @@ async def get_user_tasks(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"detail": f"User with id '{user_id}' not found"},
         )
-    # TODO: returns empty until Phase 4
-    return []
+    tasks = await task_service.list_tasks_by_assignee(db, user_id)
+    return TaskListResponse(
+        tasks=[TaskResponse.model_validate(t) for t in tasks]
+    )

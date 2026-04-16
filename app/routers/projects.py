@@ -1,7 +1,6 @@
 """Project management endpoints."""
 
 import uuid
-from typing import List
 
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
@@ -15,7 +14,8 @@ from app.schemas.project import (
     ProjectResponse,
     ProjectUpdate,
 )
-from app.services import project_service
+from app.schemas.task import TaskListResponse, TaskResponse
+from app.services import project_service, task_service
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -111,12 +111,12 @@ async def delete_project(
 
 @router.get(
     "/{project_id}/tasks",
-    response_model=List[dict],
+    response_model=TaskListResponse,
     responses={404: {"model": ErrorResponse}},
 )
 async def get_project_tasks(
     project_id: uuid.UUID, db: AsyncSession = Depends(get_db)
-) -> list:
+) -> TaskListResponse:
     """Get all tasks in a project."""
     project = await project_service.get_project(db, project_id)
     if not project:
@@ -124,5 +124,7 @@ async def get_project_tasks(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"detail": f"Project with id '{project_id}' not found"},
         )
-    # TODO: returns empty until Phase 4
-    return []
+    tasks = await task_service.list_tasks_by_project(db, project_id)
+    return TaskListResponse(
+        tasks=[TaskResponse.model_validate(t) for t in tasks]
+    )
