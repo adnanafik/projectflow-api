@@ -1,0 +1,15 @@
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:9000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/projectflow.db
+      - ENV=development
+      - DEBUG=false
+    volumes:
+      - api_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  api_data:

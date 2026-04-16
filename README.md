@@ -48,6 +48,14 @@ Prerequisites: Python 3.10+, Git
 
 Visit http://localhost:8000/docs for the API explorer.
 
+## Run with Docker
+
+```bash
+docker compose up -d
+```
+
+Visit http://localhost:9000/docs. The SQLite database persists in the `api_data` Docker volume; migrations run automatically on container start.
+
 ## Running Tests
 
 ```bash
