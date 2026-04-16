@@ -149,7 +149,7 @@ async def test_delete_user_not_found_returns_404(client: AsyncClient) -> None:
 async def test_get_user_tasks_returns_empty_list(
     client: AsyncClient, test_user: User
 ) -> None:
-    """GET /users/{id}/tasks returns empty list (tasks not built yet)."""
+    """GET /users/{id}/tasks returns empty list when no tasks assigned."""
     response = await client.get(f"/users/{test_user.id}/tasks")
     assert response.status_code == 200
-    assert response.json() == []
+    assert response.json()["tasks"] == []
