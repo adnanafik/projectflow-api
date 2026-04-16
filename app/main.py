@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.database import create_all_tables
-from app.routers import health
+from app.routers import health, users
 
 
 @asynccontextmanager
@@ -34,6 +34,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(users.router)
 
 
 @app.exception_handler(Exception)
