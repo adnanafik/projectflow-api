@@ -1,10 +1,10 @@
 """Task request/response schemas."""
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime, timezone
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class TaskCreate(BaseModel):
@@ -14,6 +14,7 @@ class TaskCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=5000)
     project_id: uuid.UUID
     assignee_id: Optional[uuid.UUID] = None
+    due_date: Optional[date] = None
 
 
 class TaskUpdate(BaseModel):
@@ -24,6 +25,7 @@ class TaskUpdate(BaseModel):
     status: Optional[str] = Field(None, min_length=1, max_length=20)
     priority: Optional[str] = Field(None, min_length=1, max_length=20)
     assignee_id: Optional[uuid.UUID] = None
+    due_date: Optional[date] = None
 
 
 class TaskResponse(BaseModel):
@@ -36,10 +38,21 @@ class TaskResponse(BaseModel):
     priority: str
     project_id: uuid.UUID
     assignee_id: Optional[uuid.UUID]
+    due_date: Optional[date]
     created_at: datetime
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def is_overdue(self) -> bool:
+        """Visual flag indicating whether the task is past its due date."""
+        if self.due_date is None:
+            return False
+        if self.status in ("done", "completed"):
+            return False
+        return self.due_date < datetime.now(timezone.utc).date()
 
 
 class TaskListResponse(BaseModel):
