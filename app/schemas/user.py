@@ -11,6 +11,8 @@ class UserCreate(BaseModel):
     """Schema for creating a new user."""
 
     name: str = Field(..., min_length=1, max_length=100)
+    # TODO: Validate that email is a proper email format using Pydantic's EmailStr.
+    # Install pydantic[email] and replace the email field type.
     email: str = Field(..., min_length=1, max_length=255)
 
 
