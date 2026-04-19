@@ -33,6 +33,7 @@ async def create_task(db: AsyncSession, data: TaskCreate) -> Task:
         priority="medium",
         project_id=data.project_id,
         assignee_id=data.assignee_id,
+        due_date=data.due_date,
     )
     db.add(task)
     await db.commit()
