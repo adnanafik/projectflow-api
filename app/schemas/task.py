@@ -1,7 +1,7 @@
 """Task request/response schemas."""
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -14,6 +14,7 @@ class TaskCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=5000)
     project_id: uuid.UUID
     assignee_id: Optional[uuid.UUID] = None
+    due_date: Optional[date] = None
 
 
 class TaskUpdate(BaseModel):
@@ -24,6 +25,7 @@ class TaskUpdate(BaseModel):
     status: Optional[str] = Field(None, min_length=1, max_length=20)
     priority: Optional[str] = Field(None, min_length=1, max_length=20)
     assignee_id: Optional[uuid.UUID] = None
+    due_date: Optional[date] = None
 
 
 class TaskResponse(BaseModel):
@@ -36,6 +38,7 @@ class TaskResponse(BaseModel):
     priority: str
     project_id: uuid.UUID
     assignee_id: Optional[uuid.UUID]
+    due_date: Optional[date]
     created_at: datetime
     updated_at: datetime
 
